@@ -1,24 +1,442 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>b12a5b73-5549-4329-86e9-8c761d9085f7</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <title>Fake News Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="og:title" content="b12a5b73-5549-4329-86e9-8c761d9085f7" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 16px;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 720px;
+        background: #020617;
+        border-radius: 16px;
+        padding: 20px 20px 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        border: 1px solid #1f2937;
+      }
+
+      .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .app-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+
+      .app-badge {
+        font-size: 0.7rem;
+        border-radius: 999px;
+        padding: 4px 10px;
+        border: 1px solid #4b5563;
+        color: #9ca3af;
+      }
+
+      .app-subtitle {
+        font-size: 0.85rem;
+        color: #9ca3af;
+        margin-bottom: 16px;
+      }
+
+      .tabs {
+        display: inline-flex;
+        border-radius: 999px;
+        border: 1px solid #374151;
+        margin-bottom: 16px;
+        padding: 2px;
+        background: #020617;
+      }
+
+      .tab {
+        font-size: 0.8rem;
+        padding: 6px 14px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #9ca3af;
+      }
+
+      .tab.active {
+        background: #111827;
+        color: #e5e7eb;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .label {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+        color: #9ca3af;
+      }
+
+      textarea,
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #374151;
+        outline: none;
+        background: #020617;
+        color: #e5e7eb;
+        font-size: 0.9rem;
+        resize: vertical;
+      }
+
+      textarea:focus,
+      input:focus {
+        border-color: #22c55e;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .btn-primary {
+        background: linear-gradient(to right, #22c55e, #16a34a);
+        color: #022c22;
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: #9ca3af;
+        border: 1px solid #374151;
+      }
+
+      .status {
+        margin-top: 12px;
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+
+      .result-card {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #020617;
+        border: 1px dashed #374151;
+      }
+
+      .result-tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 999px;
+        margin-bottom: 6px;
+      }
+
+      .result-tag.real {
+        background: rgba(34, 197, 94, 0.1);
+        color: #4ade80;
+      }
+
+      .result-tag.fake {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+      }
+
+      .result-title {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+      }
+
+      .result-confidence {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-bottom: 6px;
+      }
+
+      .result-details {
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+
+      @media (max-width: 480px) {
+        .app {
+          padding: 16px;
+        }
+
+        .actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .btn {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
   </head>
-
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="app">
+      <div class="app-header">
+        <div>
+          <div class="app-title">Fake News Detection</div>
+          <div class="app-subtitle">
+            Paste news text or a link. We'll try to classify it as fake or
+            real.
+          </div>
+        </div>
+        <div class="app-badge">AI powered</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" id="tab-text">Text</button>
+        <button class="tab" id="tab-url">URL</button>
+      </div>
+
+      <!-- TEXT MODE -->
+      <div id="mode-text">
+        <div class="field">
+          <div class="label">News text</div>
+          <textarea
+            id="newsText"
+            rows="5"
+            placeholder="Yahan complete news paste karo..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- URL MODE -->
+      <div id="mode-url" style="display: none">
+        <div class="field">
+          <div class="label">News link (URL)</div>
+          <input
+            id="newsUrl"
+            type="url"
+            placeholder="https://example.com/news-article"
+          />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        <button class="btn btn-primary" id="checkBtn">
+          🔍 Check authenticity
+        </button>
+      </div>
+
+      <div class="status" id="statusText">
+        Ready. Enter some news and click "Check authenticity".
+      </div>
+
+      <div class="result-card" id="resultCard" style="display: none">
+        <div id="resultTag" class="result-tag">Result</div>
+        <div id="resultTitle" class="result-title"></div>
+        <div id="resultConfidence" class="result-confidence"></div>
+        <div id="resultDetails" class="result-details"></div>
+      </div>
+    </div>
+
+    <script>
+      // 👉 Yahan apna backend/AI API URL daalo:
+      // Example: const API_URL = "https://xyz.supabase.co/functions/v1/check-news";
+      const API_URL = "YOUR_API_URL_HERE";
+
+      const tabText = document.getElementById("tab-text");
+      const tabUrl = document.getElementById("tab-url");
+      const modeText = document.getElementById("mode-text");
+      const modeUrl = document.getElementById("mode-url");
+
+      const newsText = document.getElementById("newsText");
+      const newsUrl = document.getElementById("newsUrl");
+      const clearBtn = document.getElementById("clearBtn");
+      const checkBtn = document.getElementById("checkBtn");
+
+      const statusText = document.getElementById("statusText");
+      const resultCard = document.getElementById("resultCard");
+      const resultTag = document.getElementById("resultTag");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultConfidence = document.getElementById("resultConfidence");
+      const resultDetails = document.getElementById("resultDetails");
+
+      let currentMode = "text"; // 'text' or 'url'
+
+      function setMode(mode) {
+        currentMode = mode;
+        if (mode === "text") {
+          tabText.classList.add("active");
+          tabUrl.classList.remove("active");
+          modeText.style.display = "";
+          modeUrl.style.display = "none";
+        } else {
+          tabText.classList.remove("active");
+          tabUrl.classList.add("active");
+          modeText.style.display = "none";
+          modeUrl.style.display = "";
+        }
+        clearResult();
+      }
+
+      function clearResult() {
+        resultCard.style.display = "none";
+        resultTitle.textContent = "";
+        resultConfidence.textContent = "";
+        resultDetails.textContent = "";
+      }
+
+      tabText.addEventListener("click", () => setMode("text"));
+      tabUrl.addEventListener("click", () => setMode("url"));
+
+      clearBtn.addEventListener("click", () => {
+        newsText.value = "";
+        if (newsUrl) newsUrl.value = "";
+        clearResult();
+        statusText.textContent =
+          'Cleared. Enter some news and click "Check authenticity".';
+      });
+
+      checkBtn.addEventListener("click", async () => {
+        clearResult();
+
+        let payload = {};
+        if (currentMode === "text") {
+          const text = newsText.value.trim();
+          if (!text) {
+            alert("Pehle news text paste karo.");
+            return;
+          }
+          payload = { type: "text", text };
+        } else {
+          const url = newsUrl.value.trim();
+          if (!url) {
+            alert("Pehle news link (URL) daalo.");
+            return;
+          }
+          payload = { type: "url", url };
+        }
+
+        statusText.textContent = "Checking… please wait.";
+
+        try {
+          if (!API_URL || API_URL === "YOUR_API_URL_HERE") {
+            // Demo fake logic (agar tumne backend URL nahi diya hai)
+            await new Promise((r) => setTimeout(r, 800));
+
+            const fakeScore = Math.random();
+            const isFake = fakeScore > 0.6;
+            const label = isFake ? "Fake" : "Likely Real";
+
+            resultTag.textContent = label;
+            resultTag.className =
+              "result-tag " + (isFake ? "fake" : "real");
+            resultTitle.textContent =
+              currentMode === "text"
+                ? "Demo result (no backend connected)"
+                : "Demo result for provided URL";
+            resultConfidence.textContent =
+              "Confidence (demo): " + Math.round(fakeScore * 100) + "%";
+            resultDetails.textContent =
+              "Ye sirf demo prediction hai. Backend API connect karoge to yahan real model ka result show hoga.";
+
+            resultCard.style.display = "block";
+            statusText.textContent =
+              "Done (demo). Connect your real API for production use.";
+            return;
+          }
+
+          // Real API request
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            throw new Error("Server error: " + res.status);
+          }
+
+          const data = await res.json();
+          // EXPECTED RESPONSE (example):
+          // { label: "fake" | "real", confidence: 0.87, explanation: "text..." }
+
+          const label = data.label || "unknown";
+          const confidence = data.confidence ?? null;
+          const explanation =
+            data.explanation ||
+            "No explanation provided by model / API.";
+
+          resultTag.textContent =
+            label === "fake"
+              ? "Fake"
+              : label === "real"
+              ? "Real"
+              : String(label);
+          resultTag.className =
+            "result-tag " +
+            (label === "fake"
+              ? "fake"
+              : label === "real"
+              ? "real"
+              : "");
+
+          resultTitle.textContent =
+            label === "fake"
+              ? "This looks like fake / misleading news."
+              : label === "real"
+              ? "This looks like likely real news."
+              : "Model could not confidently classify this.";
+
+          if (confidence !== null) {
+            resultConfidence.textContent =
+              "Confidence: " + Math.round(confidence * 100) + "%";
+          } else {
+            resultConfidence.textContent = "";
+          }
+
+          resultDetails.textContent = explanation;
+          resultCard.style.display = "block";
+          statusText.textContent = "Done. Scroll down to see the result.";
+        } catch (err) {
+          console.error(err);
+          statusText.textContent =
+            "Kuch galat ho gaya. Console me error check karo.";
+          alert(
+            "Error while checking news. API URL / network dubara check karo."
+          );
+        }
+      });
+    </script>
   </body>
 </html>
